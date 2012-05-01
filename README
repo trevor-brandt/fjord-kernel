@@ -1,6 +1,6 @@
 This is repo 2.0 of Project: Fjord
 
-It is in every relevant sense a fork of the linux kernel, but not tied to the linux kernel network as of yet.
+It is in every relevant sense a fork of the linux kernel's 3.3.y branch, but not tied to the linux kernel network as of yet (Specifically, it is a fork of a single branch, so while commit history shows authors well, it does not include the history of other branches).
 
 The stated goal of this project is tinification of the linux kernel, so as to be used in microcontroller applications or as a bootloader. Logistics of the project may change over time.
 
