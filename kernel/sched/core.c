@@ -3961,20 +3961,20 @@ static struct task_struct *find_process_by_pid(pid_t pid)
 }
 
 /* Actually do priority change: must hold rq lock. */
-static void
-__setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
-{
-	p->policy = policy;
-	p->rt_priority = prio;
-	p->normal_prio = normal_prio(p);
-	/* we are holding p->pi_lock already */
-	p->prio = rt_mutex_getprio(p);
-	if (rt_prio(p->prio))
-		p->sched_class = &rt_sched_class;
-	else
-		p->sched_class = &fair_sched_class;
-	set_load_weight(p);
-}
+//static void
+//__setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
+//{
+//	p->policy = policy;
+//	p->rt_priority = prio;
+//	p->normal_prio = normal_prio(p);
+//	/* we are holding p->pi_lock already */
+//	p->prio = rt_mutex_getprio(p);
+//	if (rt_prio(p->prio))
+//		p->sched_class = &rt_sched_class;
+//	else
+//		p->sched_class = &fair_sched_class;
+//	set_load_weight(p);
+//}
 
 /*
  * check the target process has a UID that matches the current process's
@@ -3998,10 +3998,10 @@ static bool check_same_owner(struct task_struct *p)
 static int __sched_setscheduler(struct task_struct *p, int policy,
 				const struct sched_param *param, bool user)
 {
-	int retval, on_rq, running; //oldprio, oldpolicy = -1, 
-	unsigned long flags;
-	const struct sched_class *prev_class;
-	struct rq *rq;
+	int retval;//, on_rq, running, oldprio, oldpolicy = -1; 
+	//unsigned long flags;
+	//const struct sched_class *prev_class;
+	//struct rq *rq;
 	int reset_on_fork;
 
 	/* may grab non-irq protected spin_locks */
@@ -4040,11 +4040,11 @@ static int __sched_setscheduler(struct task_struct *p, int policy,
 	/*if (user && !capable(CAP_SYS_NICE)) {
 		if (rt_policy(policy)) {
 			unsigned long rlim_rtprio =
-					task_rlimit(p, RLIMIT_RTPRIO);
+					task_rlimit(p, RLIMIT_RTPRIO);*/
 
 			/* can't set/change the rt policy */
 			/*if (policy != p->policy && !rlim_rtprio)
-				return -EPERM;
+				return -EPERM;*/
 
 			/* can't increase priority */
 			/*if (param->sched_priority > p->rt_priority &&
@@ -4059,11 +4059,11 @@ static int __sched_setscheduler(struct task_struct *p, int policy,
 		/*if (p->policy == SCHED_IDLE && policy != SCHED_IDLE) {
 			if (!can_nice(p, TASK_NICE(p)))
 				return -EPERM;
-		}
+		}*/
 
 		/* can't change other user's priorities */
 		/*if (!check_same_owner(p))
-			return -EPERM;
+			return -EPERM;*/
 
 		/* Normal users shall not reset the sched_reset_on_fork flag */
 		if (p->sched_reset_on_fork && !reset_on_fork)
