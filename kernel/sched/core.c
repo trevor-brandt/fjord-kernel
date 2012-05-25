@@ -1722,7 +1722,7 @@ void sched_fork(struct task_struct *p)
 			p->policy = SCHED_NORMAL;
 			p->static_prio = NICE_TO_PRIO(0);
 			p->rt_priority = 0;
-		} //else if (PRIO_TO_NICE(p->static_prio) < 0)
+		//} else if (PRIO_TO_NICE(p->static_prio) < 0)
 		//	p->static_prio = NICE_TO_PRIO(0);
 
 		p->prio = p->normal_prio = __normal_prio(p);
