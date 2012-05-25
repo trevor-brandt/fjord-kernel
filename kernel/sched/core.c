@@ -3998,7 +3998,7 @@ static bool check_same_owner(struct task_struct *p)
 static int __sched_setscheduler(struct task_struct *p, int policy,
 				const struct sched_param *param, bool user)
 {
-	int retval, oldprio, oldpolicy = -1, on_rq, running;
+	int retval, on_rq, running; //oldprio, oldpolicy = -1, 
 	unsigned long flags;
 	const struct sched_class *prev_class;
 	struct rq *rq;
@@ -4006,68 +4006,69 @@ static int __sched_setscheduler(struct task_struct *p, int policy,
 
 	/* may grab non-irq protected spin_locks */
 	BUG_ON(in_interrupt());
-recheck:
+//recheck:
 	/* double check policy once rq lock held */
+/*
 	if (policy < 0) {
 		reset_on_fork = p->sched_reset_on_fork;
 		policy = oldpolicy = p->policy;
-	} else {
+	} else {*/
 		reset_on_fork = !!(policy & SCHED_RESET_ON_FORK);
 		policy &= ~SCHED_RESET_ON_FORK;
 
-		if (policy != SCHED_FIFO && policy != SCHED_RR &&
+		if (policy != SCHED_FIFO)/* && policy != SCHED_RR &&
 				policy != SCHED_NORMAL && policy != SCHED_BATCH &&
-				policy != SCHED_IDLE)
+				policy != SCHED_IDLE)*/
 			return -EINVAL;
-	}
+	//}
 
 	/*
 	 * Valid priorities for SCHED_FIFO and SCHED_RR are
 	 * 1..MAX_USER_RT_PRIO-1, valid priority for SCHED_NORMAL,
 	 * SCHED_BATCH and SCHED_IDLE is 0.
 	 */
-	if (param->sched_priority < 0 ||
+	if (param->sched_priority < 1)/* ||
 	    (p->mm && param->sched_priority > MAX_USER_RT_PRIO-1) ||
-	    (!p->mm && param->sched_priority > MAX_RT_PRIO-1))
+	    (!p->mm && param->sched_priority > MAX_RT_PRIO-1))*/
 		return -EINVAL;
-	if (rt_policy(policy) != (param->sched_priority != 0))
-		return -EINVAL;
+	/*if (rt_policy(policy) != (param->sched_priority != 0))
+		return -EINVAL;*/
 
 	/*
 	 * Allow unprivileged RT tasks to decrease priority:
 	 */
-	if (user && !capable(CAP_SYS_NICE)) {
+	/*if (user && !capable(CAP_SYS_NICE)) {
 		if (rt_policy(policy)) {
 			unsigned long rlim_rtprio =
 					task_rlimit(p, RLIMIT_RTPRIO);
 
 			/* can't set/change the rt policy */
-			if (policy != p->policy && !rlim_rtprio)
+			/*if (policy != p->policy && !rlim_rtprio)
 				return -EPERM;
 
 			/* can't increase priority */
-			if (param->sched_priority > p->rt_priority &&
+			/*if (param->sched_priority > p->rt_priority &&
 			    param->sched_priority > rlim_rtprio)
 				return -EPERM;
-		}
+		}*/
 
 		/*
 		 * Treat SCHED_IDLE as nice 20. Only allow a switch to
 		 * SCHED_NORMAL if the RLIMIT_NICE would normally permit it.
 		 */
-		if (p->policy == SCHED_IDLE && policy != SCHED_IDLE) {
+		/*if (p->policy == SCHED_IDLE && policy != SCHED_IDLE) {
 			if (!can_nice(p, TASK_NICE(p)))
 				return -EPERM;
 		}
 
 		/* can't change other user's priorities */
-		if (!check_same_owner(p))
+		/*if (!check_same_owner(p))
 			return -EPERM;
 
 		/* Normal users shall not reset the sched_reset_on_fork flag */
 		if (p->sched_reset_on_fork && !reset_on_fork)
 			return -EPERM;
-	}
+	//}
 
 	if (user) {
 		retval = security_task_setscheduler(p);
@@ -4082,70 +4083,70 @@ recheck:
 	 * To be able to change p->policy safely, the appropriate
 	 * runqueue lock must be held.
 	 */
-	rq = task_rq_lock(p, &flags);
+	//rq = task_rq_lock(p, &flags);
 
 	/*
 	 * Changing the policy of the stop threads its a very bad idea
 	 */
-	if (p == rq->stop) {
+	/*if (p == rq->stop) {
 		task_rq_unlock(rq, p, &flags);
 		return -EINVAL;
-	}
+	}*/
 
 	/*
 	 * If not changing anything there's no need to proceed further:
 	 */
-	if (unlikely(policy == p->policy && (!rt_policy(policy) ||
-			param->sched_priority == p->rt_priority))) {
+	//if (unlikely(policy == p->policy && (!rt_policy(policy) ||
+	//		param->sched_priority == p->rt_priority))) {
 
-		__task_rq_unlock(rq);
-		raw_spin_unlock_irqrestore(&p->pi_lock, flags);
-		return 0;
-	}
+	//	__task_rq_unlock(rq);
+	//	raw_spin_unlock_irqrestore(&p->pi_lock, flags);
+	//	return 0;
+	//}
 
 #ifdef CONFIG_RT_GROUP_SCHED
-	if (user) {
-		/*
-		 * Do not allow realtime tasks into groups that have no runtime
-		 * assigned.
-		 */
-		if (rt_bandwidth_enabled() && rt_policy(policy) &&
-				task_group(p)->rt_bandwidth.rt_runtime == 0 &&
-				!task_group_is_autogroup(task_group(p))) {
-			task_rq_unlock(rq, p, &flags);
-			return -EPERM;
-		}
-	}
+	//if (user) {
+	//	/*
+	//	 * Do not allow realtime tasks into groups that have no runtime
+	//	 * assigned.
+	//	 */
+	//	if (rt_bandwidth_enabled() && rt_policy(policy) &&
+	//			task_group(p)->rt_bandwidth.rt_runtime == 0 &&
+	//			!task_group_is_autogroup(task_group(p))) {
+	//		task_rq_unlock(rq, p, &flags);
+	//		return -EPERM;
+	//	}
+	//}
 #endif
 
-	/* recheck policy now with rq lock held */
-	if (unlikely(oldpolicy != -1 && oldpolicy != p->policy)) {
-		policy = oldpolicy = -1;
-		task_rq_unlock(rq, p, &flags);
-		goto recheck;
-	}
-	on_rq = p->on_rq;
-	running = task_current(rq, p);
-	if (on_rq)
-		dequeue_task(rq, p, 0);
-	if (running)
-		p->sched_class->put_prev_task(rq, p);
+	///* recheck policy now with rq lock held */
+	//if (unlikely(oldpolicy != -1 && oldpolicy != p->policy)) {
+	//	policy = oldpolicy = -1;
+	//	task_rq_unlock(rq, p, &flags);
+	//	goto recheck;
+	//}
+	//on_rq = p->on_rq;
+	//running = task_current(rq, p);
+	//if (on_rq)
+	//	dequeue_task(rq, p, 0);
+	//if (running)
+	//	p->sched_class->put_prev_task(rq, p);
 
-	p->sched_reset_on_fork = reset_on_fork;
+	//p->sched_reset_on_fork = reset_on_fork;
 
-	oldprio = p->prio;
-	prev_class = p->sched_class;
-	__setscheduler(rq, p, policy, param->sched_priority);
+	//oldprio = p->prio;
+	//prev_class = p->sched_class;
+	//__setscheduler(rq, p, policy, param->sched_priority);
 
-	if (running)
-		p->sched_class->set_curr_task(rq);
-	if (on_rq)
-		enqueue_task(rq, p, 0);
+	//if (running)
+	//	p->sched_class->set_curr_task(rq);
+	//if (on_rq)
+	//	enqueue_task(rq, p, 0);
 
-	check_class_changed(rq, p, prev_class, oldprio);
-	task_rq_unlock(rq, p, &flags);
+	//check_class_changed(rq, p, prev_class, oldprio);
+	//task_rq_unlock(rq, p, &flags);
 
-	rt_mutex_adjust_pi(p);
+	//rt_mutex_adjust_pi(p);
 
 	return 0;
 }
