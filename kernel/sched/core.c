@@ -3998,14 +3998,19 @@ static bool check_same_owner(struct task_struct *p)
 static int __sched_setscheduler(struct task_struct *p, int policy,
 				const struct sched_param *param, bool user)
 {
+#if 0
 	int retval, oldprio, oldpolicy = -1, on_rq, running;
 	unsigned long flags;
 	const struct sched_class *prev_class;
 	struct rq *rq;
 	int reset_on_fork;
+#else
+	int retval, reset_on_fork;
+#endif
 
 	/* may grab non-irq protected spin_locks */
 	BUG_ON(in_interrupt());
+#if 0
 recheck:
 	/* double check policy once rq lock held */
 	if (policy < 0) {
@@ -4020,22 +4025,35 @@ recheck:
 				policy != SCHED_IDLE)
 			return -EINVAL;
 	}
+#else
+	reset_on_fork = !!(policy & SCHED_RESET_ON_FORK);
+	policy &= ~SCHED_RESET_ON_FORK;
+
+	if (policy != SCHED_FIFO)
+		return -EINVAL;
+#endif
 
 	/*
 	 * Valid priorities for SCHED_FIFO and SCHED_RR are
 	 * 1..MAX_USER_RT_PRIO-1, valid priority for SCHED_NORMAL,
 	 * SCHED_BATCH and SCHED_IDLE is 0.
 	 */
+#if 0
 	if (param->sched_priority < 0 ||
 	    (p->mm && param->sched_priority > MAX_USER_RT_PRIO-1) ||
 	    (!p->mm && param->sched_priority > MAX_RT_PRIO-1))
 		return -EINVAL;
 	if (rt_policy(policy) != (param->sched_priority != 0))
 		return -EINVAL;
+#else
+	if (param->sched_priority < 1)
+		return -EINVAL;
+#endif
 
 	/*
 	 * Allow unprivileged RT tasks to decrease priority:
 	 */
+#if 0
 	if (user && !capable(CAP_SYS_NICE)) {
 		if (rt_policy(policy)) {
 			unsigned long rlim_rtprio =
@@ -4068,13 +4086,17 @@ recheck:
 		if (p->sched_reset_on_fork && !reset_on_fork)
 			return -EPERM;
 	}
-
+#else
+	if (p->sched_reset_on_fork && !reset_on_fork)
+		return -EPERM;
+#endif
 	if (user) {
 		retval = security_task_setscheduler(p);
 		if (retval)
 			return retval;
 	}
 
+#if 0
 	/*
 	 * make sure no PI-waiters arrive (or leave) while we are
 	 * changing the priority of the task:
@@ -4146,6 +4168,7 @@ recheck:
 	task_rq_unlock(rq, p, &flags);
 
 	rt_mutex_adjust_pi(p);
+#endif
 
 	return 0;
 }
