@@ -1,3 +1,4 @@
+
 /*
  * Completely Fair Scheduling (CFS) Class (SCHED_NORMAL/SCHED_BATCH)
  *
@@ -109,6 +110,8 @@ unsigned int __read_mostly sysctl_sched_shares_window = 10000000UL;
   */
 unsigned int sysctl_sched_cfs_bandwidth_slice = 5000UL;
 #endif
+
+#if 0
 
 /*
  * Increase the granularity value when there are more CPUs,
@@ -5620,3 +5623,5 @@ __init void init_sched_fair_class(void)
 #endif /* SMP */
 
 }
+
+#endif

@@ -403,6 +403,7 @@ static void tick_nohz_stop_sched_tick(struct tick_sched *ts)
 		 * first call we save the current tick time, so we can restart
 		 * the scheduler tick in nohz_restart_sched_tick.
 		 */
+#if 0
 		if (!ts->tick_stopped) {
 			select_nohz_load_balancer(1);
 
@@ -410,6 +411,7 @@ static void tick_nohz_stop_sched_tick(struct tick_sched *ts)
 			ts->tick_stopped = 1;
 			ts->idle_jiffies = last_jiffies;
 		}
+#endif
 
 		ts->idle_sleeps++;
 
@@ -472,7 +474,9 @@ void tick_nohz_idle_enter(void)
  	 * State will be updated to busy during the first busy tick after
  	 * exiting idle.
  	 */
+#if 0
 	set_cpu_sd_state_idle();
+#endif
 
 	local_irq_disable();
 
@@ -577,7 +581,9 @@ void tick_nohz_idle_exit(void)
 	ts->inidle = 0;
 
 	/* Update jiffies first */
+#if 0
 	select_nohz_load_balancer(0);
+#endif
 	tick_do_update_jiffies64(now);
 
 #ifndef CONFIG_VIRT_CPU_ACCOUNTING

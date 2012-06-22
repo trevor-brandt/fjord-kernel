@@ -1455,7 +1455,7 @@ static void rcu_cpu_kthread_setrt(int cpu, int to_rt)
 		policy = SCHED_FIFO;
 		sp.sched_priority = RCU_KTHREAD_PRIO;
 	} else {
-		policy = SCHED_NORMAL;
+		policy = SCHED_FIFO;
 		sp.sched_priority = 0;
 	}
 	sched_setscheduler_nocheck(t, policy, &sp);
@@ -1491,7 +1491,7 @@ static void rcu_yield(void (*f)(unsigned long), unsigned long arg)
 	setup_timer_on_stack(&yield_timer, f, arg);
 	mod_timer(&yield_timer, jiffies + 2);
 	sp.sched_priority = 0;
-	sched_setscheduler_nocheck(current, SCHED_NORMAL, &sp);
+	sched_setscheduler_nocheck(current, SCHED_FIFO, &sp);
 	set_user_nice(current, 19);
 	schedule();
 	set_user_nice(current, 0);

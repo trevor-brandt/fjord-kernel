@@ -1475,10 +1475,12 @@ void scheduler_ipi(void)
 	/*
 	 * Check if someone kicked us for doing the nohz idle load balance.
 	 */
+#if 0
 	if (unlikely(got_nohz_idle_kick() && !need_resched())) {
 		this_rq()->idle_balance = 1;
 		raise_softirq_irqoff(SCHED_SOFTIRQ);
 	}
+#endif
 	irq_exit();
 }
 
@@ -1720,7 +1722,7 @@ void sched_fork(struct task_struct *p)
 	 */
 	if (unlikely(p->sched_reset_on_fork)) {
 		if (task_has_rt_policy(p)) {
-			p->policy = SCHED_NORMAL;
+			p->policy = SCHED_FIFO;
 			p->static_prio = NICE_TO_PRIO(0);
 			p->rt_priority = 0;
 		} else if (PRIO_TO_NICE(p->static_prio) < 0)
@@ -1736,8 +1738,10 @@ void sched_fork(struct task_struct *p)
 		p->sched_reset_on_fork = 0;
 	}
 
+#if 0
 	if (!rt_prio(p->prio))
 		p->sched_class = &fair_sched_class;
+#endif
 
 	if (p->sched_class->task_fork)
 		p->sched_class->task_fork(p);
@@ -2999,9 +3003,11 @@ void scheduler_tick(void)
 
 	perf_event_task_tick();
 
+#if 0
 #ifdef CONFIG_SMP
 	rq->idle_balance = idle_cpu(cpu);
 	trigger_load_balance(rq, cpu);
+#endif
 #endif
 }
 
@@ -3127,11 +3133,13 @@ pick_next_task(struct rq *rq)
 	 * Optimization: we know that if all tasks are in
 	 * the fair class we can call that function directly:
 	 */
+#if 0 
 	if (likely(rq->nr_running == rq->cfs.h_nr_running)) {
 		p = fair_sched_class.pick_next_task(rq);
 		if (likely(p))
 			return p;
 	}
+#endif
 
 	for_each_class(class) {
 		p = class->pick_next_task(rq);
@@ -3192,8 +3200,10 @@ need_resched:
 
 	pre_schedule(rq, prev);
 
+#if 0
 	if (unlikely(!rq->nr_running))
 		idle_balance(cpu, rq);
+#endif
 
 	put_prev_task(rq, prev);
 	next = pick_next_task(rq);
@@ -3776,10 +3786,14 @@ void rt_mutex_setprio(struct task_struct *p, int prio)
 	if (running)
 		p->sched_class->put_prev_task(rq, p);
 
+#if 0
 	if (rt_prio(prio))
 		p->sched_class = &rt_sched_class;
 	else
 		p->sched_class = &fair_sched_class;
+#else
+	p->sched_class = &rt_sched_class;
+#endif
 
 	p->prio = prio;
 
@@ -3969,10 +3983,14 @@ __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 	p->normal_prio = normal_prio(p);
 	/* we are holding p->pi_lock already */
 	p->prio = rt_mutex_getprio(p);
+#if 0
 	if (rt_prio(p->prio))
 		p->sched_class = &rt_sched_class;
 	else
 		p->sched_class = &fair_sched_class;
+#else
+	p->sched_class = &rt_sched_class;
+#endif
 	set_load_weight(p);
 }
 
@@ -5113,7 +5131,9 @@ static void migrate_tasks(unsigned int dead_cpu)
 	rq->stop = NULL;
 
 	/* Ensure any throttled groups are reachable by pick_next_task */
+#if 0
 	unthrottle_offline_cfs_rqs(rq);
+#endif
 
 	for ( ; ; ) {
 		/*
@@ -5384,7 +5404,9 @@ migration_call(struct notifier_block *nfb, unsigned long action, void *hcpu)
 #endif
 	}
 
+#if 0
 	update_max_interval();
+#endif
 
 	return NOTIFY_OK;
 }
@@ -6130,7 +6152,9 @@ static void init_sched_groups_power(int cpu, struct sched_domain *sd)
 	if (cpu != group_first_cpu(sg))
 		return;
 
+#if 0
 	update_group_power(sd, cpu);
+#endif
 	atomic_set(&sg->sgp->nr_busy_cpus, sg->group_weight);
 }
 
@@ -6809,7 +6833,9 @@ void __init sched_init_smp(void)
 	/* Move init over to a non-isolated CPU */
 	if (set_cpus_allowed_ptr(current, non_isolated_cpus) < 0)
 		BUG();
+#if 0
 	sched_init_granularity();
+#endif
 	free_cpumask_var(non_isolated_cpus);
 
 	init_sched_rt_class();
@@ -6817,7 +6843,9 @@ void __init sched_init_smp(void)
 #else
 void __init sched_init_smp(void)
 {
+#if 0
 	sched_init_granularity();
+#endif
 }
 #endif /* CONFIG_SMP */
 
@@ -6911,7 +6939,9 @@ void __init sched_init(void)
 		rq->nr_running = 0;
 		rq->calc_load_active = 0;
 		rq->calc_load_update = jiffies + LOAD_FREQ;
+#if 0
 		init_cfs_rq(&rq->cfs);
+#endif
 		init_rt_rq(&rq->rt, rq);
 #ifdef CONFIG_FAIR_GROUP_SCHED
 		root_task_group.shares = ROOT_TASK_GROUP_LOAD;
@@ -7000,7 +7030,11 @@ void __init sched_init(void)
 	/*
 	 * During early bootup we pretend to be a normal task:
 	 */
+#if 0
 	current->sched_class = &fair_sched_class;
+#else
+	current->sched_class = &rt_sched_class;
+#endif
 
 #ifdef CONFIG_SMP
 	zalloc_cpumask_var(&sched_domains_tmpmask, GFP_NOWAIT);
@@ -7008,7 +7042,9 @@ void __init sched_init(void)
 	if (cpu_isolated_map == NULL)
 		zalloc_cpumask_var(&cpu_isolated_map, GFP_NOWAIT);
 #endif
+#if 0
 	init_sched_fair_class();
+#endif
 
 	scheduler_running = 1;
 }
@@ -7059,7 +7095,7 @@ static void normalize_task(struct rq *rq, struct task_struct *p)
 	on_rq = p->on_rq;
 	if (on_rq)
 		dequeue_task(rq, p, 0);
-	__setscheduler(rq, p, SCHED_NORMAL, 0);
+	__setscheduler(rq, p, SCHED_FIFO, 0);
 	if (on_rq) {
 		enqueue_task(rq, p, 0);
 		resched_task(rq->curr);
@@ -7593,8 +7629,12 @@ static int cpu_cgroup_can_attach(struct cgroup_subsys *ss, struct cgroup *cgrp,
 			return -EINVAL;
 #else
 		/* We don't support RT-tasks being in separate groups */
+#if 0
 		if (task->sched_class != &fair_sched_class)
 			return -EINVAL;
+#else
+		return -EINVAL;
+#endif
 #endif
 	}
 	return 0;
