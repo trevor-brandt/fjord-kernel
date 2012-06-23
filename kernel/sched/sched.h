@@ -47,6 +47,7 @@ extern __read_mostly int scheduler_running;
  */
 #define RUNTIME_INF	((u64)~0ULL)
 
+#if 0
 static inline int rt_policy(int policy)
 {
 	if (policy == SCHED_FIFO || policy == SCHED_RR)
@@ -58,6 +59,7 @@ static inline int task_has_rt_policy(struct task_struct *p)
 {
 	return rt_policy(p->policy);
 }
+#endif
 
 /*
  * This is the priority-queue data structure of the RT scheduling class:
