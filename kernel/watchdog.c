@@ -351,7 +351,11 @@ static int watchdog(void *unused)
 	}
 	__set_current_state(TASK_RUNNING);
 	param.sched_priority = 0;
+#if 0
+	sched_setscheduler(current, SCHED_NORMAL, &param);
+#else
 	sched_setscheduler(current, SCHED_FIFO, &param);
+#endif
 	return 0;
 }
 
