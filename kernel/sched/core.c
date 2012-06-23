@@ -1006,10 +1006,14 @@ static inline int normal_prio(struct task_struct *p)
 {
 	int prio;
 
+#if 0
 	if (task_has_rt_policy(p))
 		prio = MAX_RT_PRIO-1 - p->rt_priority;
 	else
 		prio = __normal_prio(p);
+#else
+	prio = MAX_RT_PRIO-1 - p->rt_priority;
+#endif
 	return prio;
 }
 
@@ -1719,12 +1723,18 @@ void sched_fork(struct task_struct *p)
 	 * Revert to default priority/policy on fork if requested.
 	 */
 	if (unlikely(p->sched_reset_on_fork)) {
+#if 0
 		if (task_has_rt_policy(p)) {
 			p->policy = SCHED_NORMAL;
 			p->static_prio = NICE_TO_PRIO(0);
 			p->rt_priority = 0;
 		} else if (PRIO_TO_NICE(p->static_prio) < 0)
 			p->static_prio = NICE_TO_PRIO(0);
+#else
+		p->policy = SCHED_NORMAL;
+		p->static_prio = NICE_TO_PRIO(0);
+		p->rt_priority = 0;
+#endif
 
 		p->prio = p->normal_prio = __normal_prio(p);
 		set_load_weight(p);
@@ -3813,10 +3823,15 @@ void set_user_nice(struct task_struct *p, long nice)
 	 * it wont have any effect on scheduling until the task is
 	 * SCHED_FIFO/SCHED_RR:
 	 */
+#if 0
 	if (task_has_rt_policy(p)) {
 		p->static_prio = NICE_TO_PRIO(nice);
 		goto out_unlock;
 	}
+#else
+	p->static_prio = NICE_TO_PRIO(nice);
+	goto out_unlock;
+#endif
 	on_rq = p->on_rq;
 	if (on_rq)
 		dequeue_task(rq, p, 0);
