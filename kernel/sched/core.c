@@ -3976,6 +3976,7 @@ static struct task_struct *find_process_by_pid(pid_t pid)
 }
 
 /* Actually do priority change: must hold rq lock. */
+#if 0
 static void
 __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 {
@@ -3990,6 +3991,7 @@ __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 		p->sched_class = &fair_sched_class;
 	set_load_weight(p);
 }
+#endif
 
 /*
  * check the target process has a UID that matches the current process's
@@ -7074,7 +7076,9 @@ static void normalize_task(struct rq *rq, struct task_struct *p)
 	on_rq = p->on_rq;
 	if (on_rq)
 		dequeue_task(rq, p, 0);
+#if 0
 	__setscheduler(rq, p, SCHED_NORMAL, 0);
+#endif
 	if (on_rq) {
 		enqueue_task(rq, p, 0);
 		resched_task(rq->curr);
