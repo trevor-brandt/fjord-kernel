@@ -386,7 +386,9 @@ static struct sysrq_key_op sysrq_kill_op = {
 
 static void sysrq_handle_unrt(int key)
 {
+#if 0
 	normalize_rt_tasks();
+#endif
 }
 static struct sysrq_key_op sysrq_unrt_op = {
 	.handler	= sysrq_handle_unrt,

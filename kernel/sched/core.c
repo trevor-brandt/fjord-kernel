@@ -7066,6 +7066,7 @@ void __might_sleep(const char *file, int line, int preempt_offset)
 EXPORT_SYMBOL(__might_sleep);
 #endif
 
+#if 0
 #ifdef CONFIG_MAGIC_SYSRQ
 static void normalize_task(struct rq *rq, struct task_struct *p)
 {
@@ -7076,9 +7077,9 @@ static void normalize_task(struct rq *rq, struct task_struct *p)
 	on_rq = p->on_rq;
 	if (on_rq)
 		dequeue_task(rq, p, 0);
-#if 0
+
 	__setscheduler(rq, p, SCHED_NORMAL, 0);
-#endif
+
 	if (on_rq) {
 		enqueue_task(rq, p, 0);
 		resched_task(rq->curr);
@@ -7131,6 +7132,7 @@ void normalize_rt_tasks(void)
 }
 
 #endif /* CONFIG_MAGIC_SYSRQ */
+#endif
 
 #if defined(CONFIG_IA64) || defined(CONFIG_KGDB_KDB)
 /*
