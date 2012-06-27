@@ -3976,10 +3976,14 @@ static struct task_struct *find_process_by_pid(pid_t pid)
 }
 
 /* Actually do priority change: must hold rq lock. */
-#if 0
 static void
 __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 {
+#if 0
+#else
+	policy = SCHED_FIFO;
+	prio = MAX_USER_RT_PRIO-1;
+#endif
 	p->policy = policy;
 	p->rt_priority = prio;
 	p->normal_prio = normal_prio(p);
@@ -3991,7 +3995,6 @@ __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 		p->sched_class = &fair_sched_class;
 	set_load_weight(p);
 }
-#endif
 
 /*
  * check the target process has a UID that matches the current process's
@@ -4022,7 +4025,15 @@ static int __sched_setscheduler(struct task_struct *p, int policy,
 	struct rq *rq;
 	int reset_on_fork;
 #else
-	int retval, reset_on_fork;
+	int retval, oldprio, oldpolicy = -1, on_rq, running;
+	unsigned long flags;
+	const struct sched_class *prev_class;
+	struct rq *rq;
+	int reset_on_fork;
+	int prio;
+
+	policy = SCHED_FIFO;
+	prio = MAX_USER_RT_PRIO-1;
 #endif
 
 	/* may grab non-irq protected spin_locks */
@@ -4062,8 +4073,8 @@ recheck:
 		return -EINVAL;
 	if (rt_policy(policy) != (param->sched_priority != 0))
 		return -EINVAL;
-#else
-	if (param->sched_priority < 1)
+#elif 1==0 
+	if (param->sched_priority != MAX_USER_RT_PRIO-1)
 		return -EINVAL;
 #endif
 
@@ -4113,7 +4124,6 @@ recheck:
 			return retval;
 	}
 
-#if 0
 	/*
 	 * make sure no PI-waiters arrive (or leave) while we are
 	 * changing the priority of the task:
@@ -4134,6 +4144,7 @@ recheck:
 	/*
 	 * If not changing anything there's no need to proceed further:
 	 */
+#if 0
 	if (unlikely(policy == p->policy && (!rt_policy(policy) ||
 			param->sched_priority == p->rt_priority))) {
 
@@ -4141,6 +4152,7 @@ recheck:
 		raw_spin_unlock_irqrestore(&p->pi_lock, flags);
 		return 0;
 	}
+#endif
 
 #ifdef CONFIG_RT_GROUP_SCHED
 	if (user) {
@@ -4158,11 +4170,13 @@ recheck:
 #endif
 
 	/* recheck policy now with rq lock held */
+#if 0
 	if (unlikely(oldpolicy != -1 && oldpolicy != p->policy)) {
 		policy = oldpolicy = -1;
 		task_rq_unlock(rq, p, &flags);
 		goto recheck;
 	}
+#endif
 	on_rq = p->on_rq;
 	running = task_current(rq, p);
 	if (on_rq)
@@ -4174,7 +4188,11 @@ recheck:
 
 	oldprio = p->prio;
 	prev_class = p->sched_class;
+#if 0
 	__setscheduler(rq, p, policy, param->sched_priority);
+#else
+	__setscheduler(rq, p, policy, prio);
+#endif
 
 	if (running)
 		p->sched_class->set_curr_task(rq);
@@ -4185,7 +4203,6 @@ recheck:
 	task_rq_unlock(rq, p, &flags);
 
 	rt_mutex_adjust_pi(p);
-#endif
 
 	return 0;
 }
@@ -4201,7 +4218,12 @@ recheck:
 int sched_setscheduler(struct task_struct *p, int policy,
 		       const struct sched_param *param)
 {
+#if 0
 	return __sched_setscheduler(p, policy, param, true);
+#else
+	policy = SCHED_FIFO;
+	return __sched_setscheduler(p, policy, param, true);
+#endif
 }
 EXPORT_SYMBOL_GPL(sched_setscheduler);
 
@@ -4219,7 +4241,12 @@ EXPORT_SYMBOL_GPL(sched_setscheduler);
 int sched_setscheduler_nocheck(struct task_struct *p, int policy,
 			       const struct sched_param *param)
 {
+#if 0
 	return __sched_setscheduler(p, policy, param, false);
+#else
+	policy = SCHED_FIFO;
+	return __sched_setscheduler(p, policy, param, false);
+#endif
 }
 
 static int
