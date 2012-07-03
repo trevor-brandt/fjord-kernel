@@ -213,9 +213,7 @@ calc_delta_mine(unsigned long delta_exec, unsigned long weight,
 }
 
 
-#if 0
 const struct sched_class fair_sched_class;
-#endif
 
 /**************************************************************
  * CFS operations on generic schedulable entities:
@@ -5563,7 +5561,6 @@ static unsigned int get_rr_interval_fair(struct rq *rq, struct task_struct *task
 /*
  * All the scheduling class methods:
  */
-#if 0
 const struct sched_class fair_sched_class = {
 	.next			= &idle_sched_class,
 	.enqueue_task		= enqueue_task_fair,
@@ -5599,7 +5596,6 @@ const struct sched_class fair_sched_class = {
 	.task_move_group	= task_move_group_fair,
 #endif
 };
-#endif
 
 #ifdef CONFIG_SCHED_DEBUG
 void print_cfs_stats(struct seq_file *m, int cpu)
