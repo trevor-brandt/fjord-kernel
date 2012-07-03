@@ -2008,6 +2008,8 @@ static unsigned int get_rr_interval_rt(struct rq *rq, struct task_struct *task)
 const struct sched_class rt_sched_class = {
 #if 0
 	.next			= &fair_sched_class,
+#else
+	.next			= &idle_sched_class,
 #endif
 	.enqueue_task		= enqueue_task_rt,
 	.dequeue_task		= dequeue_task_rt,
