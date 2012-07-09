@@ -6,6 +6,17 @@
 
 #include "cpupri.h"
 
+#if 0
+#else
+
+extern bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preempt);
+
+extern void task_fork_fair(struct task_struct *p);
+
+extern void switched_from_fair(struct rq *rq, struct task_struct *p);
+
+#endif
+
 extern __read_mostly int scheduler_running;
 
 /*

@@ -213,7 +213,9 @@ calc_delta_mine(unsigned long delta_exec, unsigned long weight,
 }
 
 
+#if 0
 const struct sched_class fair_sched_class;
+#endif
 
 /**************************************************************
  * CFS operations on generic schedulable entities:
@@ -3065,7 +3067,7 @@ static void yield_task_fair(struct rq *rq)
 	set_skip_buddy(se);
 }
 
-static bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preempt)
+extern bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preempt)
 {
 	struct sched_entity *se = &p->se;
 
@@ -5215,7 +5217,7 @@ static void task_tick_fair(struct rq *rq, struct task_struct *curr, int queued)
  *  - child not yet on the tasklist
  *  - preemption disabled
  */
-static void task_fork_fair(struct task_struct *p)
+extern void task_fork_fair(struct task_struct *p)
 {
 	struct cfs_rq *cfs_rq;
 	struct sched_entity *se = &p->se, *curr;
@@ -5278,7 +5280,7 @@ prio_changed_fair(struct rq *rq, struct task_struct *p, int oldprio)
 		check_preempt_curr(rq, p, 0);
 }
 
-static void switched_from_fair(struct rq *rq, struct task_struct *p)
+extern void switched_from_fair(struct rq *rq, struct task_struct *p)
 {
 	struct sched_entity *se = &p->se;
 	struct cfs_rq *cfs_rq = cfs_rq_of(se);
@@ -5561,6 +5563,7 @@ static unsigned int get_rr_interval_fair(struct rq *rq, struct task_struct *task
 /*
  * All the scheduling class methods:
  */
+#if 0
 const struct sched_class fair_sched_class = {
 	.next			= &idle_sched_class,
 	.enqueue_task		= enqueue_task_fair,
@@ -5596,6 +5599,7 @@ const struct sched_class fair_sched_class = {
 	.task_move_group	= task_move_group_fair,
 #endif
 };
+#endif
 
 #ifdef CONFIG_SCHED_DEBUG
 void print_cfs_stats(struct seq_file *m, int cpu)

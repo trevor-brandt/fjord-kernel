@@ -2006,11 +2006,7 @@ static unsigned int get_rr_interval_rt(struct rq *rq, struct task_struct *task)
 }
 
 const struct sched_class rt_sched_class = {
-#if 0
 	.next			= &fair_sched_class,
-#else
-	.next			= &idle_sched_class,
-#endif
 	.enqueue_task		= enqueue_task_rt,
 	.dequeue_task		= dequeue_task_rt,
 	.yield_task		= yield_task_rt,
@@ -2040,6 +2036,48 @@ const struct sched_class rt_sched_class = {
 	.prio_changed		= prio_changed_rt,
 	.switched_to		= switched_to_rt,
 };
+
+#if 0
+#else
+const struct sched_class fair_sched_class = {
+	.next			= &idle_sched_class,
+	.enqueue_task		= enqueue_task_rt,
+	.dequeue_task		= dequeue_task_rt,
+	.yield_task		= yield_task_rt,
+	.yield_to_task		= yield_to_task_fair,
+
+	.check_preempt_curr	= check_preempt_curr_rt,
+
+	.pick_next_task		= pick_next_task_rt,
+	.put_prev_task		= put_prev_task_rt,
+
+#ifdef CONFIG_SMP
+	.select_task_rq		= select_task_rq_rt,
+
+	.set_cpus_allowed       = set_cpus_allowed_rt,
+	.rq_online              = rq_online_rt,
+	.rq_offline             = rq_offline_rt,
+	.pre_schedule		= pre_schedule_rt,
+	.post_schedule		= post_schedule_rt,
+	.task_woken		= task_woken_rt,
+	.switched_from		= switched_from_rt,
+	.task_waking		= task_waking_fair,
+#endif
+
+	.set_curr_task          = set_curr_task_rt,
+	.task_tick		= task_tick_rt,
+	.task_fork		= task_fork_fair,
+
+	.get_rr_interval	= get_rr_interval_rt,
+
+	.prio_changed		= prio_changed_rt,
+	.switched_from		= switched_from_fair,
+	.switched_to		= switched_to_rt,
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	.task_move_group	= task_move_group_fair,
+#endif
+};
+#endif
 
 #ifdef CONFIG_SCHED_DEBUG
 extern void print_rt_rq(struct seq_file *m, int cpu, struct rt_rq *rt_rq);
