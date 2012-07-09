@@ -213,7 +213,9 @@ calc_delta_mine(unsigned long delta_exec, unsigned long weight,
 }
 
 
+#if 0
 const struct sched_class fair_sched_class;
+#endif
 
 /**************************************************************
  * CFS operations on generic schedulable entities:
@@ -2347,7 +2349,11 @@ static unsigned long cpu_avg_load_per_task(int cpu)
 }
 
 
+#if 0
 static void task_waking_fair(struct task_struct *p)
+#else
+extern void task_waking_fair(struct task_struct *p)
+#endif
 {
 	struct sched_entity *se = &p->se;
 	struct cfs_rq *cfs_rq = cfs_rq_of(se);
@@ -3065,7 +3071,11 @@ static void yield_task_fair(struct rq *rq)
 	set_skip_buddy(se);
 }
 
+#if 0
 static bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preempt)
+#else
+extern bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preempt)
+#endif
 {
 	struct sched_entity *se = &p->se;
 
@@ -5215,7 +5225,11 @@ static void task_tick_fair(struct rq *rq, struct task_struct *curr, int queued)
  *  - child not yet on the tasklist
  *  - preemption disabled
  */
+#if 0
 static void task_fork_fair(struct task_struct *p)
+#else
+extern void task_fork_fair(struct task_struct *p)
+#endif
 {
 	struct cfs_rq *cfs_rq;
 	struct sched_entity *se = &p->se, *curr;
@@ -5350,7 +5364,11 @@ void init_cfs_rq(struct cfs_rq *cfs_rq)
 }
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
+#if 0
 static void task_move_group_fair(struct task_struct *p, int on_rq)
+#else
+extern void task_move_group_fair(struct task_struct *p, int on_rq)
+#endif
 {
 	/*
 	 * If the task was not on the rq at the time of this cgroup movement
@@ -5560,6 +5578,7 @@ static unsigned int get_rr_interval_fair(struct rq *rq, struct task_struct *task
 /*
  * All the scheduling class methods:
  */
+#if 0
 const struct sched_class fair_sched_class = {
 	.next			= &idle_sched_class,
 	.enqueue_task		= enqueue_task_fair,
@@ -5595,6 +5614,7 @@ const struct sched_class fair_sched_class = {
 	.task_move_group	= task_move_group_fair,
 #endif
 };
+#endif
 
 #ifdef CONFIG_SCHED_DEBUG
 void print_cfs_stats(struct seq_file *m, int cpu)

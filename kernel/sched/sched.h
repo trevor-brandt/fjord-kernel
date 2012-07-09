@@ -8,6 +8,19 @@
 
 extern __read_mostly int scheduler_running;
 
+#if 0
+#else
+
+extern bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preempt);
+
+extern void task_fork_fair(struct task_struct *p);
+
+extern void task_waking_fair(struct task_struct *p);
+
+extern void task_move_group_fair(struct task_struct *p, int on_rq);
+
+#endif
+
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
  * to static priority [ MAX_RT_PRIO..MAX_PRIO-1 ],
