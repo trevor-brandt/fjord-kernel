@@ -1043,12 +1043,16 @@ void dec_rt_tasks(struct sched_rt_entity *rt_se, struct rt_rq *rt_rq)
 	dec_rt_group(rt_se, rt_rq);
 }
 
+int iter = 0;
+
 static void __enqueue_rt_entity(struct sched_rt_entity *rt_se, bool head)
 {
 	struct rt_rq *rt_rq = rt_rq_of_se(rt_se);
 	struct rt_prio_array *array = &rt_rq->active;
 	struct rt_rq *group_rq = group_rt_rq(rt_se);
 	struct list_head *queue = array->queue + rt_se_prio(rt_se);
+
+	printk("enqueue_iteration = %d", ++iter);
 
 	/*
 	 * Don't enqueue the group if its throttled, or when empty.
@@ -1064,8 +1068,11 @@ static void __enqueue_rt_entity(struct sched_rt_entity *rt_se, bool head)
 
 	if (head)
 		list_add(&rt_se->run_list, queue);
-	else
+	else {
+		if (queue->prev == NULL)
+			while(1);
 		list_add_tail(&rt_se->run_list, queue);
+	}
 	__set_bit(rt_se_prio(rt_se), array->bitmap);
 
 	inc_rt_tasks(rt_se, rt_rq);
@@ -1129,13 +1136,16 @@ static void dequeue_rt_entity(struct sched_rt_entity *rt_se)
 static void
 enqueue_task_rt(struct rq *rq, struct task_struct *p, int flags)
 {
+	printk("%d", p->policy);
 	struct sched_rt_entity *rt_se = &p->rt;
 
 	if (flags & ENQUEUE_WAKEUP)
 		rt_se->timeout = 0;
 
+
 	enqueue_rt_entity(rt_se, flags & ENQUEUE_HEAD);
 
+	while (1);
 	if (!task_current(rq, p) && p->rt.nr_cpus_allowed > 1)
 		enqueue_pushable_task(rq, p);
 
