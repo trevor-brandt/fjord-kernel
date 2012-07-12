@@ -1736,9 +1736,9 @@ void sched_fork(struct task_struct *p)
 		p->sched_reset_on_fork = 0;
 	}
 
-	if (!rt_prio(p->prio))
+/*	if (!rt_prio(p->prio))
 		p->sched_class = &fair_sched_class;
-
+*/
 	if (p->sched_class->task_fork)
 		p->sched_class->task_fork(p);
 
@@ -3127,12 +3127,12 @@ pick_next_task(struct rq *rq)
 	 * Optimization: we know that if all tasks are in
 	 * the fair class we can call that function directly:
 	 */
-	if (likely(rq->nr_running == rq->cfs.h_nr_running)) {
+/*	if (likely(rq->nr_running == rq->cfs.h_nr_running)) {
 		p = fair_sched_class.pick_next_task(rq);
 		if (likely(p))
 			return p;
 	}
-
+*/
 	for_each_class(class) {
 		p = class->pick_next_task(rq);
 		if (p)
