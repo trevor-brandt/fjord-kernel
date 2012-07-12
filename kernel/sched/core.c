@@ -3776,10 +3776,10 @@ void rt_mutex_setprio(struct task_struct *p, int prio)
 	if (running)
 		p->sched_class->put_prev_task(rq, p);
 
-	if (rt_prio(prio))
+//	if (rt_prio(prio))
 		p->sched_class = &rt_sched_class;
-	else
-		p->sched_class = &fair_sched_class;
+//	else
+//		p->sched_class = &fair_sched_class;
 
 	p->prio = prio;
 
@@ -3969,10 +3969,10 @@ __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 	p->normal_prio = normal_prio(p);
 	/* we are holding p->pi_lock already */
 	p->prio = rt_mutex_getprio(p);
-	if (rt_prio(p->prio))
+//	if (rt_prio(p->prio))
 		p->sched_class = &rt_sched_class;
-	else
-		p->sched_class = &fair_sched_class;
+//	else
+//		p->sched_class = &fair_sched_class;
 	set_load_weight(p);
 }
 
