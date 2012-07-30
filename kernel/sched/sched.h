@@ -47,6 +47,7 @@ extern __read_mostly int scheduler_running;
  */
 #define RUNTIME_INF	((u64)~0ULL)
 
+#if 0
 static inline int rt_policy(int policy)
 {
 	if (policy == SCHED_FIFO || policy == SCHED_RR)
@@ -58,6 +59,7 @@ static inline int task_has_rt_policy(struct task_struct *p)
 {
 	return rt_policy(p->policy);
 }
+#endif
 
 /*
  * This is the priority-queue data structure of the RT scheduling class:
@@ -852,7 +854,9 @@ enum cpuacct_stat_index {
    for (class = sched_class_highest; class; class = class->next)
 
 extern const struct sched_class stop_sched_class;
+#if 0
 extern const struct sched_class rt_sched_class;
+#endif
 extern const struct sched_class fair_sched_class;
 extern const struct sched_class idle_sched_class;
 

@@ -978,6 +978,7 @@ void sched_set_stop_task(int cpu, struct task_struct *stop)
 
 	cpu_rq(cpu)->stop = stop;
 
+#if 0
 	if (old_stop) {
 		/*
 		 * Reset it back to a normal scheduling class so that
@@ -985,6 +986,7 @@ void sched_set_stop_task(int cpu, struct task_struct *stop)
 		 */
 		old_stop->sched_class = &rt_sched_class;
 	}
+#endif
 }
 
 /*
@@ -1006,9 +1008,11 @@ static inline int normal_prio(struct task_struct *p)
 {
 	int prio;
 
+#if 0
 	if (task_has_rt_policy(p))
 		prio = MAX_RT_PRIO-1 - p->rt_priority;
 	else
+#endif
 		prio = __normal_prio(p);
 	return prio;
 }
@@ -1028,9 +1032,13 @@ static int effective_prio(struct task_struct *p)
 	 * keep the priority unchanged. Otherwise, update priority
 	 * to the normal priority:
 	 */
+#if 0
 	if (!rt_prio(p->prio))
 		return p->normal_prio;
 	return p->prio;
+#else
+	return p->normal_prio;
+#endif
 }
 
 /**
@@ -1719,11 +1727,15 @@ void sched_fork(struct task_struct *p)
 	 * Revert to default priority/policy on fork if requested.
 	 */
 	if (unlikely(p->sched_reset_on_fork)) {
+#if 0
 		if (task_has_rt_policy(p)) {
 			p->policy = SCHED_NORMAL;
 			p->static_prio = NICE_TO_PRIO(0);
 			p->rt_priority = 0;
 		} else if (PRIO_TO_NICE(p->static_prio) < 0)
+#else
+		if (PRIO_TO_NICE(p->static_prio) < 0)
+#endif
 			p->static_prio = NICE_TO_PRIO(0);
 
 		p->prio = p->normal_prio = __normal_prio(p);
@@ -1736,9 +1748,11 @@ void sched_fork(struct task_struct *p)
 		p->sched_reset_on_fork = 0;
 	}
 
-/*	if (!rt_prio(p->prio))
+#if 0
+	if (!rt_prio(p->prio))
+#endif
 		p->sched_class = &fair_sched_class;
-*/
+
 	if (p->sched_class->task_fork)
 		p->sched_class->task_fork(p);
 
@@ -3127,12 +3141,12 @@ pick_next_task(struct rq *rq)
 	 * Optimization: we know that if all tasks are in
 	 * the fair class we can call that function directly:
 	 */
-/*	if (likely(rq->nr_running == rq->cfs.h_nr_running)) {
+	if (likely(rq->nr_running == rq->cfs.h_nr_running)) {
 		p = fair_sched_class.pick_next_task(rq);
 		if (likely(p))
 			return p;
 	}
-*/
+
 	for_each_class(class) {
 		p = class->pick_next_task(rq);
 		if (p)
@@ -3776,10 +3790,12 @@ void rt_mutex_setprio(struct task_struct *p, int prio)
 	if (running)
 		p->sched_class->put_prev_task(rq, p);
 
-//	if (rt_prio(prio))
+#if 0
+	if (rt_prio(prio))
 		p->sched_class = &rt_sched_class;
-//	else
-//		p->sched_class = &fair_sched_class;
+	else
+#endif
+		p->sched_class = &fair_sched_class;
 
 	p->prio = prio;
 
@@ -3813,10 +3829,12 @@ void set_user_nice(struct task_struct *p, long nice)
 	 * it wont have any effect on scheduling until the task is
 	 * SCHED_FIFO/SCHED_RR:
 	 */
+#if 0
 	if (task_has_rt_policy(p)) {
 		p->static_prio = NICE_TO_PRIO(nice);
 		goto out_unlock;
 	}
+#endif
 	on_rq = p->on_rq;
 	if (on_rq)
 		dequeue_task(rq, p, 0);
@@ -3969,10 +3987,12 @@ __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 	p->normal_prio = normal_prio(p);
 	/* we are holding p->pi_lock already */
 	p->prio = rt_mutex_getprio(p);
-//	if (rt_prio(p->prio))
+#if 0
+	if (rt_prio(p->prio))
 		p->sched_class = &rt_sched_class;
-//	else
-//		p->sched_class = &fair_sched_class;
+	else
+#endif
+		p->sched_class = &fair_sched_class;
 	set_load_weight(p);
 }
 
@@ -4030,13 +4050,16 @@ recheck:
 	    (p->mm && param->sched_priority > MAX_USER_RT_PRIO-1) ||
 	    (!p->mm && param->sched_priority > MAX_RT_PRIO-1))
 		return -EINVAL;
+#if 0
 	if (rt_policy(policy) != (param->sched_priority != 0))
 		return -EINVAL;
+#endif
 
 	/*
 	 * Allow unprivileged RT tasks to decrease priority:
 	 */
 	if (user && !capable(CAP_SYS_NICE)) {
+#if 0
 		if (rt_policy(policy)) {
 			unsigned long rlim_rtprio =
 					task_rlimit(p, RLIMIT_RTPRIO);
@@ -4050,6 +4073,7 @@ recheck:
 			    param->sched_priority > rlim_rtprio)
 				return -EPERM;
 		}
+#endif
 
 		/*
 		 * Treat SCHED_IDLE as nice 20. Only allow a switch to
@@ -4095,6 +4119,7 @@ recheck:
 	/*
 	 * If not changing anything there's no need to proceed further:
 	 */
+#if 0
 	if (unlikely(policy == p->policy && (!rt_policy(policy) ||
 			param->sched_priority == p->rt_priority))) {
 
@@ -4102,6 +4127,7 @@ recheck:
 		raw_spin_unlock_irqrestore(&p->pi_lock, flags);
 		return 0;
 	}
+#endif
 
 #ifdef CONFIG_RT_GROUP_SCHED
 	if (user) {
@@ -4109,12 +4135,14 @@ recheck:
 		 * Do not allow realtime tasks into groups that have no runtime
 		 * assigned.
 		 */
+#if 0
 		if (rt_bandwidth_enabled() && rt_policy(policy) &&
 				task_group(p)->rt_bandwidth.rt_runtime == 0 &&
 				!task_group_is_autogroup(task_group(p))) {
 			task_rq_unlock(rq, p, &flags);
 			return -EPERM;
 		}
+#endif
 	}
 #endif
 
@@ -6778,8 +6806,10 @@ void __init sched_init_smp(void)
 	hotcpu_notifier(cpuset_cpu_active, CPU_PRI_CPUSET_ACTIVE);
 	hotcpu_notifier(cpuset_cpu_inactive, CPU_PRI_CPUSET_INACTIVE);
 
+#if 0
 	/* RT runtime code needs to handle some hotplug events */
 	hotcpu_notifier(update_runtime, 0);
+#endif
 
 	init_hrtick();
 
@@ -6789,7 +6819,9 @@ void __init sched_init_smp(void)
 	sched_init_granularity();
 	free_cpumask_var(non_isolated_cpus);
 
+#if 0
 	init_sched_rt_class();
+#endif
 }
 #else
 void __init sched_init_smp(void)
@@ -6858,12 +6890,16 @@ void __init sched_init(void)
 	init_defrootdomain();
 #endif
 
+#if 0
 	init_rt_bandwidth(&def_rt_bandwidth,
 			global_rt_period(), global_rt_runtime());
+#endif
 
 #ifdef CONFIG_RT_GROUP_SCHED
+#if 0
 	init_rt_bandwidth(&root_task_group.rt_bandwidth,
 			global_rt_period(), global_rt_runtime());
+#endif
 #endif /* CONFIG_RT_GROUP_SCHED */
 
 #ifdef CONFIG_CGROUP_SCHED
@@ -6889,7 +6925,9 @@ void __init sched_init(void)
 		rq->calc_load_active = 0;
 		rq->calc_load_update = jiffies + LOAD_FREQ;
 		init_cfs_rq(&rq->cfs);
+#if 0
 		init_rt_rq(&rq->rt, rq);
+#endif
 #ifdef CONFIG_FAIR_GROUP_SCHED
 		root_task_group.shares = ROOT_TASK_GROUP_LOAD;
 		INIT_LIST_HEAD(&rq->leaf_cfs_rq_list);
@@ -6916,7 +6954,9 @@ void __init sched_init(void)
 		init_tg_cfs_entry(&root_task_group, &rq->cfs, NULL, i, NULL);
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
+#if 0
 		rq->rt.rt_runtime = def_rt_bandwidth.rt_runtime;
+#endif
 #ifdef CONFIG_RT_GROUP_SCHED
 		INIT_LIST_HEAD(&rq->leaf_rt_rq_list);
 		init_tg_rt_entry(&root_task_group, &rq->rt, NULL, i, NULL);
@@ -7144,7 +7184,9 @@ static DEFINE_SPINLOCK(task_group_lock);
 static void free_sched_group(struct task_group *tg)
 {
 	free_fair_sched_group(tg);
+#if 0
 	free_rt_sched_group(tg);
+#endif
 	autogroup_free(tg);
 	kfree(tg);
 }
@@ -7162,8 +7204,10 @@ struct task_group *sched_create_group(struct task_group *parent)
 	if (!alloc_fair_sched_group(tg, parent))
 		goto err;
 
+#if 0
 	if (!alloc_rt_sched_group(tg, parent))
 		goto err;
+#endif
 
 	spin_lock_irqsave(&task_group_lock, flags);
 	list_add_rcu(&tg->list, &task_groups);
@@ -7480,6 +7524,7 @@ static int sched_rt_global_constraints(void)
 	if (sysctl_sched_rt_runtime == 0)
 		return -EBUSY;
 
+#if 0
 	raw_spin_lock_irqsave(&def_rt_bandwidth.rt_runtime_lock, flags);
 	for_each_possible_cpu(i) {
 		struct rt_rq *rt_rq = &cpu_rq(i)->rt;
@@ -7489,6 +7534,7 @@ static int sched_rt_global_constraints(void)
 		raw_spin_unlock(&rt_rq->rt_runtime_lock);
 	}
 	raw_spin_unlock_irqrestore(&def_rt_bandwidth.rt_runtime_lock, flags);
+#endif
 
 	return 0;
 }
@@ -7508,6 +7554,7 @@ int sched_rt_handler(struct ctl_table *table, int write,
 
 	ret = proc_dointvec(table, write, buffer, lenp, ppos);
 
+#if 0
 	if (!ret && write) {
 		ret = sched_rt_global_constraints();
 		if (ret) {
@@ -7520,6 +7567,7 @@ int sched_rt_handler(struct ctl_table *table, int write,
 		}
 	}
 	mutex_unlock(&mutex);
+#endif
 
 	return ret;
 }
