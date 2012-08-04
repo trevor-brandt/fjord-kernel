@@ -27,6 +27,13 @@ config IRQ_WORK
 	bool
 	depends on HAVE_IRQ_WORK
 
+config REALTIME_SCHED
+	bool "Realtime Scheduler" if EXPERT
+	default y
+	help
+	  This option enables support for the realtime scheduler and the
+	  corresponding scheduling classes SCHED_FIFO and SCHED_RR.
+
 menu "General setup"
 
 config EXPERIMENTAL
@@ -753,6 +760,7 @@ config CFS_BANDWIDTH
 
 config RT_GROUP_SCHED
 	bool "Group scheduling for SCHED_RR/FIFO"
+	depends on REALTIME_SCHED
 	depends on EXPERIMENTAL
 	depends on CGROUP_SCHED
 	default n
