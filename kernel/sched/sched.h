@@ -47,6 +47,8 @@ extern __read_mostly int scheduler_running;
  */
 #define RUNTIME_INF	((u64)~0ULL)
 
+#ifdef CONFIG_REALTIME_SCHED
+
 static inline int rt_policy(int policy)
 {
 	if (policy == SCHED_FIFO || policy == SCHED_RR)
@@ -58,6 +60,19 @@ static inline int task_has_rt_policy(struct task_struct *p)
 {
 	return rt_policy(p->policy);
 }
+
+#else /* CONFIG_REALTIME_SCHED */
+
+static inline int rt_policy(int policy)
+{
+	return 0;
+}
+static inline int task_has_rt_policy(struct task_struct *p)
+{
+	return 0;
+}
+
+#endif /* CONFIG_REALTIME_SCHED */
 
 /*
  * This is the priority-queue data structure of the RT scheduling class:
@@ -190,8 +205,17 @@ extern void __refill_cfs_bandwidth_runtime(struct cfs_bandwidth *cfs_b);
 extern void __start_cfs_bandwidth(struct cfs_bandwidth *cfs_b);
 extern void unthrottle_cfs_rq(struct cfs_rq *cfs_rq);
 
+#ifdef CONFIG_REALTIME_SCHED
 extern void free_rt_sched_group(struct task_group *tg);
 extern int alloc_rt_sched_group(struct task_group *tg, struct task_group *parent);
+#else
+static inline void free_rt_sched_group(struct task_group *tg) { }
+static inline int alloc_rt_sched_group(struct task_group *tg,
+			struct task_group *parent)
+{
+	return 1;
+}
+#endif
 extern void init_tg_rt_entry(struct task_group *tg, struct rt_rq *rt_rq,
 		struct sched_rt_entity *rt_se, int cpu,
 		struct sched_rt_entity *parent);
@@ -852,7 +876,11 @@ enum cpuacct_stat_index {
    for (class = sched_class_highest; class; class = class->next)
 
 extern const struct sched_class stop_sched_class;
+#ifdef CONFIG_REALTIME_SCHED
 extern const struct sched_class rt_sched_class;
+#else
+static const struct sched_class rt_sched_class = { };
+#endif
 extern const struct sched_class fair_sched_class;
 extern const struct sched_class idle_sched_class;
 
@@ -874,15 +902,29 @@ extern void sysrq_sched_debug_show(void);
 extern void sched_init_granularity(void);
 extern void update_max_interval(void);
 extern void update_group_power(struct sched_domain *sd, int cpu);
+#ifdef CONFIG_REALTIME_SCHED
 extern int update_runtime(struct notifier_block *nfb, unsigned long action, void *hcpu);
 extern void init_sched_rt_class(void);
+#else
+static inline int update_runtime(struct notifier_block *nfb,
+			unsigned long action, void *hcpu)
+{
+	return 0;
+}
+static inline void init_sched_rt_class(void) { }
+#endif
 extern void init_sched_fair_class(void);
 
 extern void resched_task(struct task_struct *p);
 extern void resched_cpu(int cpu);
 
 extern struct rt_bandwidth def_rt_bandwidth;
+#ifdef CONFIG_REALTIME_SCHED
 extern void init_rt_bandwidth(struct rt_bandwidth *rt_b, u64 period, u64 runtime);
+#else
+static inline void init_rt_bandwidth(struct rt_bandwidth *rt_b,
+			u64 period, u64 runtime) { }
+#endif
 
 extern void update_cpu_load(struct rq *this_rq);
 
@@ -1150,7 +1192,11 @@ extern void print_cfs_stats(struct seq_file *m, int cpu);
 extern void print_rt_stats(struct seq_file *m, int cpu);
 
 extern void init_cfs_rq(struct cfs_rq *cfs_rq);
+#ifdef CONFIG_REALTIME_SCHED
 extern void init_rt_rq(struct rt_rq *rt_rq, struct rq *rq);
+#else
+static inline void init_rt_rq(struct rt_rq *rt_rq, struct rq *rq) { }
+#endif
 extern void unthrottle_offline_cfs_rqs(struct rq *rq);
 
 extern void account_cfs_bandwidth_used(int enabled, int was_enabled);

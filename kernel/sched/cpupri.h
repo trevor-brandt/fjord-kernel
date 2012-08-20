@@ -20,7 +20,7 @@ struct cpupri {
 	int               cpu_to_pri[NR_CPUS];
 };
 
-#ifdef CONFIG_SMP
+#if defined(CONFIG_SMP) && defined(CONFIG_REALTIME_SCHED)
 int  cpupri_find(struct cpupri *cp,
 		 struct task_struct *p, struct cpumask *lowest_mask);
 void cpupri_set(struct cpupri *cp, int cpu, int pri);
@@ -32,6 +32,7 @@ static inline int cpupri_init(struct cpupri *cp)
 {
 	return 0;
 }
+static inline void cpupri_cleanup(struct cpupri *cp) { }
 #endif
 
 #endif /* _LINUX_CPUPRI_H */
