@@ -27,8 +27,11 @@ void cpupri_set(struct cpupri *cp, int cpu, int pri);
 int cpupri_init(struct cpupri *cp);
 void cpupri_cleanup(struct cpupri *cp);
 #else
-#define cpupri_set(cp, cpu, pri) do { } while (0)
-#define cpupri_init() do { } while (0)
+static inline void cpupri_set(struct cpupri *cp, int cpu, int pri) { }
+static inline int cpupri_init(struct cpupri *cp)
+{
+	return 0;
+}
 #endif
 
 #endif /* _LINUX_CPUPRI_H */
